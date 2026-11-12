@@ -354,6 +354,55 @@ if (![...region.options].some(o => o.value === "Los Lagos")) {
 }
 
 document.getElementById("total").textContent = datos.length;
+  
+/* COQUIMBO - REPORTES DEL 12/11/2026 */
+
+fuentes.coquimboActualizado =
+  "https://www.miradiols.cl/2026/11/12/ruta-5-tiene-transito-fluido-camioneros-mantienen-movilizaciones-en-dos-puntos-de-la-region/";
+
+// Evitar duplicaciones de los puntos de Coquimbo
+for (let i = datos.length - 1; i >= 0; i--) {
+  if (
+    datos[i][0] === "Coquimbo" &&
+    (datos[i][2].includes("Las Tacas") ||
+     datos[i][2].includes("Lagunillas") ||
+     datos[i][2].includes("La Higuera"))
+  ) {
+    datos.splice(i, 1);
+  }
+}
+
+datos.push(
+  [
+    "Coquimbo",
+    "Ruta 5 Norte",
+    "Las Tacas, km 440-443",
+    -30.09, -71.36,
+    "presencia",
+    "Camioneros movilizados. Autoridades informaron tránsito habilitado tras despejar la vía el 12/11/2026.",
+    "coquimboActualizado"
+  ],
+  [
+    "Coquimbo",
+    "Ruta D-43",
+    "Lagunillas, Ovalle, km 6 aprox.",
+    -30.60, -71.13,
+    "presencia",
+    "Concentración de camioneros. Sin cierre total confirmado. Reporte del 12/11/2026.",
+    "coquimboActualizado"
+  ]
+);
+
+// Agregar Coquimbo al filtro regional
+if (![...region.options].some(o => o.value === "Coquimbo")) {
+  const opcion = document.createElement("option");
+  opcion.value = "Coquimbo";
+  opcion.textContent = "Coquimbo";
+  region.appendChild(opcion);
+}
+
+document.getElementById("total").textContent = datos.length;
+
 actualizar();
 </script>
 </body>
