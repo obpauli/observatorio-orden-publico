@@ -236,9 +236,7 @@ document.getElementById("search").oninput=actualizar;
 region.onchange=actualizar;
 document.getElementById("estado").onchange=actualizar;
 actualizar();
-</script>
-</body>
-</html>
+
 
 const nuevosReportes = [
   ["Tarapacá","Puerto de Iquique","Acceso a terminales",-20.213,-70.155,"parcial","Acceso restringido a camiones de carga. Vehículos menores pueden circular.","https://portalportuario.cl/restriccion-de-ingreso-de-camiones-a-puerto-de-iquique-persiste-en-nueva-jornada-de-paro-del-sector-transportista-terrestre/"],
@@ -356,3 +354,7 @@ if (![...region.options].some(o => o.value === "Los Lagos")) {
 }
 
 document.getElementById("total").textContent = datos.length;
+actualizar();
+</script>
+</body>
+</html>
