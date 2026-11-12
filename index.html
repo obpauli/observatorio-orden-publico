@@ -186,3 +186,35 @@ actualizar();
 </script>
 </body>
 </html>
+
+const nuevosReportes = [
+  ["Tarapacá","Puerto de Iquique","Acceso a terminales",-20.213,-70.155,"parcial","Acceso restringido a camiones de carga. Vehículos menores pueden circular.","https://portalportuario.cl/restriccion-de-ingreso-de-camiones-a-puerto-de-iquique-persiste-en-nueva-jornada-de-paro-del-sector-transportista-terrestre/"],
+  ["Tarapacá","Ruta 5 Norte","Pozo Almonte",-20.258,-69.785,"desconocido","Restricción a carga reportada el 11/11. Vigencia no reconfirmada.","https://www.cooperativa.cl/noticias/pais/manifestaciones/paro-camionero-bloqueo-en-iquique-afecta-exportaciones-y-mantiene/2026-11-11/201809.html"],
+  ["Antofagasta","Ruta 5 / Ruta 28","Enlace La Negra",-23.7,-70.28,"parcial","Primera pista ocupada por camiones.","https://www.soychile.cl/Antofagasta/Sociedad/2026/11/12/972469/paro-camioneros-antofagasta.html"],
+  ["Antofagasta","Ruta 1","Mejillones, km 30",-23.2,-70.45,"parcial","Primera pista bloqueada en ambos sentidos.","https://www.soychile.cl/Antofagasta/Sociedad/2026/11/12/972469/paro-camioneros-antofagasta.html"],
+  ["Antofagasta","Ruta B-25","Calama, km 106, ENAEX",-22.46,-68.94,"parcial","Camiones ocupan la primera pista. Paso habilitado para vehículos menores y buses.","https://www.soychile.cl/Antofagasta/Sociedad/2026/11/12/972469/paro-camioneros-antofagasta.html"],
+  ["Coquimbo","Ruta 5 Norte","Las Tacas, km 440–443",-30.09,-71.36,"presencia","Movilización de camiones. Autoridad informó que la circulación fue normalizada.","https://www.miradiols.cl/2026/11/12/ruta-5-tiene-transito-fluido-camioneros-mantienen-movilizaciones-en-dos-puntos-de-la-region/"],
+  ["Coquimbo","Ruta 43","Sector La Higuera, Ovalle, km 6",-30.6,-71.13,"presencia","Concentración de camioneros, sin corte total confirmado.","https://www.miradiols.cl/2026/11/12/ruta-5-tiene-transito-fluido-camioneros-mantienen-movilizaciones-en-dos-puntos-de-la-region/"],
+  ["Biobío","Acceso Puerto San Vicente","Talcahuano",-36.735,-73.138,"parcial","Bloqueado el acceso a depósitos de contenedores.","https://www.biobiochile.cl/noticias/nacional/region-del-bio-bio/2026/11/12/gran-concepcion-camioneros-se-manifestaron-bloqueando-acceso-a-depositos-en-puerto-de-san-vicente.shtml"],
+  ["Biobío","Ruta 146","Concepción, km 64,5, Juan Riquelme",-36.85,-72.9,"parcial","Una pista habilitada en dirección a Concepción.","https://elcontraste.cl/region-biobio/2026/11/12/mas-de-1-000-camiones-se-mantienen-movilizados-en-la-region-de-biobio-revisa-los-cortes-y-el-estado-de-las-rutas/"],
+  ["Biobío","Ruta 5 Sur","Los Ángeles, km 494",-37.45,-72.37,"parcial","Camioneros movilizados, con interrupciones parciales reportadas.","https://www.biobiochile.cl/noticias/nacional/chile/2026/11/10/con-interrupciones-parciales-de-transito-continua-manifestacion-de-camioneros-por-alza-de-combustibles.shtml"]
+];
+
+nuevosReportes.forEach(d => {
+  const [reg,ruta,lugar,lat,lon,estado,detalle,url] = d;
+  const clave = "fuenteNueva" + Object.keys(fuentes).length;
+  fuentes[clave] = url;
+  datos.push([reg,ruta,lugar,lat,lon,estado,detalle,clave]);
+});
+
+document.getElementById("total").textContent = datos.length;
+
+const selectorRegion = document.getElementById("region");
+[...new Set(datos.map(d=>d[0]))].sort().forEach(r=>{
+  if (![...selectorRegion.options].some(o=>o.value===r)){
+    const opcion=document.createElement("option");
+    opcion.value=r;
+    opcion.textContent=r;
+    selectorRegion.appendChild(opcion);
+  }
+});
