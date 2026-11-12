@@ -218,3 +218,51 @@ const selectorRegion = document.getElementById("region");
     selectorRegion.appendChild(opcion);
   }
 });
+
+const reportesAricaTemuco = [
+  [
+    "Arica y Parinacota",
+    "Ruta 5 Norte",
+    "Presencias Tutelares, salida sur de Arica",
+    -18.63299, -70.25654,
+    "intermitente",
+    "Camiones bloqueados. Paso intermitente de buses y vehículos menores según reporte del 10/11. Se coordinaron salidas de buses el 12/11. Vigencia del bloqueo no reconfirmada.",
+    "https://radiopaulina.cl/2026/11/10/delegado-de-arica-informa-estado-de-rutas-por-paro-de-camioneros-y-asegura-que-existe-abastecimiento-de-combustibles-y-gas-para-mas-de-30-dias/"
+  ],
+  [
+    "La Araucanía",
+    "Ruta 5 Sur",
+    "Ingreso norte a Temuco",
+    -38.69, -72.62,
+    "presencia",
+    "Camiones estacionados por el paro. No hay confirmación de cierre total.",
+    "https://www.biobiochile.cl/noticias/nacional/region-de-la-araucania/2026/11/12/araucania-camioneros-advierten-que-podrian-radicalizar-paro-y-que-propuesta-de-gobierno-no-es-ideal.shtml"
+  ],
+  [
+    "La Araucanía",
+    "Ruta 5 Sur",
+    "Victoria, km 608",
+    -38.22, -72.33,
+    "presencia",
+    "Aproximadamente 68 camiones estacionados. Tránsito no confirmado como totalmente cortado.",
+    "https://araucanianoticias.cl/2026/delegado-presidencial-de-malleco-monitorea-movilizacion-de-camioneros-en-victoria-y-llama-a-mantener-el-transito-en-la-ruta-5-sur/1112318893"
+  ]
+];
+
+reportesAricaTemuco.forEach((d, i) => {
+  const idFuente = "aricaTemuco" + i;
+  fuentes[idFuente] = d[7];
+  datos.push([...d.slice(0, 7), idFuente]);
+});
+
+document.getElementById("total").textContent = datos.length;
+
+const regionesNuevas = ["Arica y Parinacota", "La Araucanía"];
+regionesNuevas.forEach(r => {
+  if (![...region.options].some(o => o.value === r)) {
+    const option = document.createElement("option");
+    option.value = r;
+    option.textContent = r;
+    region.appendChild(option);
+  }
+});
