@@ -266,3 +266,40 @@ regionesNuevas.forEach(r => {
     region.appendChild(option);
   }
 });
+
+/* TRANSPORTE INFORMA LOS LAGOS - 12/11/2026 */
+
+fuentes["ttiLosLagos"] =
+  "https://x.com/TTILosLagos/status/2120900466523414791";
+
+const nuevosLosLagos = [
+  [
+    "Los Lagos",
+    "Ruta 5 Sur",
+    "Osorno, sector Pilauco, km 915",
+    -40.55, -73.13,
+    "presencia",
+    "Ruta habilitada. Camiones estacionados en la berma, sentido sur a norte. Reporte oficial 12/11/2026, 09:21.",
+    "ttiLosLagos"
+  ],
+  [
+    "Los Lagos",
+    "Ruta 5 Sur",
+    "Puerto Montt, sector Industrial, km 1018",
+    -41.47, -72.94,
+    "presencia",
+    "Ruta habilitada. Camiones estacionados en la berma, sentido norte a sur. Reporte oficial 12/11/2026, 09:21.",
+    "ttiLosLagos"
+  ]
+];
+
+datos.push(...nuevosLosLagos);
+
+if (![...region.options].some(o => o.value === "Los Lagos")) {
+  const opcion = document.createElement("option");
+  opcion.value = "Los Lagos";
+  opcion.textContent = "Los Lagos";
+  region.appendChild(opcion);
+}
+
+document.getElementById("total").textContent = datos.length;
