@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observatorio de Orden Público</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f8;color:#183448}
+header{background:#093b55;color:white;padding:24px}
+h1{margin:5px 0;font-size:30px}
+header p{margin:5px 0;color:#cce3ef}
+main{padding:16px;max-width:1600px;margin:auto}
+.notice{background:#fff7df;border:1px solid #e5d39c;padding:13px;border-radius:9px;margin-bottom:14px;line-height:1.5}
+.summary{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.stat{background:white;border:1px solid #d6e2ea;border-radius:9px;padding:15px;flex:1;min-width:130px}
+.stat b{font-size:23px;display:block}
+.stat small{color:#526d7f}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:14px}
+.panel{background:white;border:1px solid #d6e2ea;border-radius:10px;overflow:hidden}
+.controls{padding:15px}
+input,select{width:100%;padding:11px;margin-top:9px;border:1px solid #c9d8e1;border-radius:6px;background:white}
+#map{height:680px;width:100%;background:#e6f1f6}
+#reports{height:460px;overflow-y:auto}
+.report{padding:13px;border-top:1px solid #e0e8ee;cursor:pointer}
+.report:hover{background:#f0f7ff}
+.report b{display:block;margin:6px 0}
+.report small{color:#647c89}
+.report p{font-size:13px;line-height:1.5}
+.legend{padding:12px;font-size:13px;display:flex;gap:15px;flex-wrap:wrap}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:5px}
+button{padding:9px;background:#135a81;color:white;border:0;border-radius:6px;cursor:pointer}
+footer{padding:16px;font-size:12px;color:#627785}
+@media(max-width:800px){.layout{grid-template-columns:1fr}#map{height:520px}#reports{height:300px}}
+</style>
+</head>
+<body>
+<header>
+<small>OBSERVATORIO DE ORDEN PÚBLICO · CHILE</small>
+<h1>Observatorio de Orden Público</h1>
+<p>Mapa nacional de bloqueos, restricciones y movilizaciones de transportistas</p>
+</header>
+<main>
+<div class="notice">
+<b>Información histórica, no en vivo.</b>
+Los puntos corresponden a reportes del 12 de noviembre de 2026.
+Su ubicación es aproximada. No se confirma que las restricciones
+continúen vigentes. Verifique las fuentes antes de viajar.
+</div>
+<div class="summary">
+<div class="stat"><b id="total">13</b><small>Reportes del paro</small></div>
+<div class="stat"><b id="visible">13</b><small>Reportes visibles</small></div>
+<div class="stat"><b>12/11/2026</b><small>Fecha de los reportes</small></div>
+</div>
+<div class="layout">
+<section class="panel">
+<div class="controls">
+<h3>Rutas y movilizaciones</h3>
+<input id="search" placeholder="Buscar ruta, comuna o ciudad">
+<select id="region">
+<option value="">Todas las regiones</option>
+</select>
+<select id="estado">
+<option value="">Todos los estados</option>
+<option value="total">Corte total</option>
+<option value="intermitente">Restricción intermitente</option>
+<option value="parcial">Restricción parcial</option>
+<option value="presencia">Presencia de transportistas</option>
+<option value="desconocido">Estado sin confirmar</option>
+</select>
+</div>
+<div id="reports"></div>
+</section>
+<section class="panel">
+<div class="controls">
+<button onclick="map.setView([-33.45,-70.67],9)">Santiago</button>
+<button onclick="map.setView([-33.05,-71.55],9)">Valparaíso</button>
+<button onclick="map.setView([-35,-71],5)">Todo Chile</button>
+</div>
+<div class="legend">
+<span><i class="dot" style="background:#d32f2f"></i>Total</span>
+<span><i class="dot" style="background:#9149b6"></i>Intermitente</span>
+<span><i class="dot" style="background:#f18a29"></i>Parcial</span>
+<span><i class="dot" style="background:#287ab9"></i>Presencia</span>
+<span><i class="dot" style="background:#777"></i>Sin confirmar</span>
+</div>
+<div id="map"></div>
+</section>
+</div>
+<footer>Cartografía © OpenStreetMap contributors. Reportes de prensa con ubicación aproximada. No usar como sistema de navegación en tiempo real.</footer>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const fuentes={
+emol:"https://www.emol.com/noticias/Nacional/2026/11/12/1216888/cortes-rutas-camiones-alza-bencinas.html",
+emol2:"https://www.emol.com/noticias/Nacional/2026/11/12/1216834/paro-camioneros-ruta-bloqueos.html",
+cooperativa:"https://cooperativa.cl/noticias/pais/manifestaciones/pese-a-concesiones-del-gobierno-transportistas-mantienen-paro-por/2026-11-12/073801.html",
+pauta:"https://www.pauta.cl/actualidad/2026/11/12/paro-de-camioneros-en-chile-revisa-las-rutas-con-cortes-y-congestion-este-jueves.html"
+};
+const datos=[
+["Metropolitana","Ruta 68","Pudahuel, km 12,5",-33.44,-70.824,"parcial","Camiones detenidos, una pista por sentido","emol"],
+["Metropolitana","Ruta 78","Talagante, km 38",-33.663,-70.929,"parcial","Pistas lenta y central restringidas","emol"],
+["Metropolitana","Ruta 5 Norte","Quilicura, sector CCU",-33.359,-70.699,"parcial","Una pista habilitada hacia el sur","emol"],
+["Metropolitana","Ruta 5 Sur","San Bernardo, pasarela Colón",-33.601,-70.701,"parcial","Buses interurbanos ocupan una pista","cooperativa"],
+["Metropolitana","Ruta 5 Sur","Linderos, km 40",-33.828,-70.706,"parcial","Una pista habilitada","emol2"],
+["Valparaíso","Ruta 68","Enlace Algarrobo, km 65",-33.343,-71.437,"presencia","Congestión vinculada al paro","emol2"],
+["Valparaíso","Ruta 5 Norte","La Ligua, km 147",-32.453,-71.229,"parcial","Restricción de pistas","emol2"],
+["O’Higgins","Ruta 5 Sur","Rengo, km 112",-34.404,-70.862,"parcial","Una pista por sentido","emol2"],
+["Maule","Ruta 5 Sur","Talca, km 249",-35.399,-71.62,"parcial","Solo pista izquierda habilitada","emol2"],
+["Atacama","Ruta 5 Norte","Vallenar–Caldera",-28.18,-70.689,"parcial","Restricciones parciales para vehículos","emol"],
+["Tarapacá","Ruta 1","Patillos–Patache",-20.808,-70.184,"desconocido","Corte reportado sin extensión confirmada","pauta"],
+["Biobío","Ruta 5 Sur","Los Ángeles–Mulchén",-37.638,-72.251,"presencia","Camiones estacionados, sin corte total confirmado","pauta"],
+["Metropolitana","Tocornal","Puente Alto",-33.621,-70.567,"presencia","Colectiveros movilizados","emol"]
+];
+const colores={
+total:"#d32f2f",
+intermitente:"#9149b6",
+parcial:"#f18a29",
+presencia:"#287ab9",
+desconocido:"#777777"
+};
+const nombres={
+total:"Corte total",
+intermitente:"Restricción intermitente",
+parcial:"Restricción parcial",
+presencia:"Presencia o congestión",
+desconocido:"Estado sin confirmar"
+};
+const map=L.map("map").setView([-33.45,-70.85],9);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+attribution:"© OpenStreetMap contributors",
+maxZoom:18
+}).addTo(map);
+const layer=L.layerGroup().addTo(map);
+const region=document.getElementById("region");
+[...new Set(datos.map(d=>d[0]))].sort().forEach(r=>{
+let o=document.createElement("option");
+o.value=r;o.textContent=r;region.appendChild(o);
+});
+function actualizar(){
+layer.clearLayers();
+const lista=document.getElementById("reports");
+lista.replaceChildren();
+const filtro=document.getElementById("estado").value;
+const texto=document.getElementById("search").value.toLowerCase();
+let n=0;
+datos.forEach(d=>{
+const [reg,ruta,lugar,lat,lon,estado,detalle,fuente]=d;
+if(region.value && region.value!==reg)return;
+if(filtro && filtro!==estado)return;
+if(!(`${reg} ${ruta} ${lugar} ${detalle}`.toLowerCase().includes(texto)))return;
+n++;
+const popup=`
+<b>${ruta} · ${lugar}</b>
+<p>${nombres[estado]}</p>
+<p>${detalle}</p>
+<p>Región: ${reg}</p>
+<p>Reporte: 12/11/2026</p>
+<p>Ubicación aproximada. Vigencia no confirmada.</p>
+<a href="${fuentes[fuente]}" target="_blank" rel="noopener">Consultar fuente</a>`;
+const marcador=L.circleMarker([lat,lon],{
+radius:9,color:"#ffffff",weight:3,
+fillColor:colores[estado],fillOpacity:1
+}).addTo(layer).bindPopup(popup);
+const item=document.createElement("div");
+item.className="report";
+item.innerHTML=`<small>${reg} · 12/11/2026</small>
+<b>${ruta} · ${lugar}</b>
+<span style="color:${colores[estado]}">${nombres[estado]}</span>
+<p>${detalle}</p>`;
+item.onclick=()=>{
+map.setView([lat,lon],12);
+marcador.openPopup();
+};
+lista.appendChild(item);
+});
+document.getElementById("visible").textContent=n;
+if(!n)lista.textContent="No hay reportes para este filtro.";
+}
+document.getElementById("search").oninput=actualizar;
+region.onchange=actualizar;
+document.getElementById("estado").onchange=actualizar;
+actualizar();
+</script>
+</body>
+</html>
