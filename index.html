@@ -403,6 +403,67 @@ if (![...region.options].some(o => o.value === "Coquimbo")) {
 
 document.getElementById("total").textContent = datos.length;
 
+/* MEJILLONES - 13 DE NOVIEMBRE DE 2026 */
+
+fuentes.mejillones =
+  "https://www.24horas.cl/actualidad/nacional/camioneros-antofagasta-temuco-mantienen-movilizaciones-pese-a-acuerdo";
+
+fuentes.rutasMejillones =
+  "https://www.soychile.cl/antofagasta/sociedad/2026/11/12/972469/paro-camioneros-antofagasta.html";
+
+// Evitar duplicados de estos sectores
+for (let i = datos.length - 1; i >= 0; i--) {
+  if (
+    datos[i][0] === "Antofagasta" &&
+    /Mejillones|B-400|B-262/.test(datos[i][2])
+  ) {
+    datos.splice(i, 1);
+  }
+}
+
+datos.push(
+  [
+    "Antofagasta",
+    "Ruta 1 / B-1",
+    "Mejillones, km 30",
+    -23.20, -70.45,
+    "parcial",
+    "Camiones de carga. Movilización continúa el 13/11. Último balance vial detallado del 12/11: primera pista ocupada en ambos sentidos. Paso permitido a buses y vehículos menores. Restricción de hoy pendiente de verificar.",
+    "rutasMejillones"
+  ],
+  [
+    "Antofagasta",
+    "Ruta B-400",
+    "Mejillones, km 32",
+    -23.25, -70.45,
+    "parcial",
+    "Camiones de carga. Movilización continúa el 13/11. Último balance vial detallado del 12/11: primera pista ocupada en ambos sentidos. Restricción de hoy pendiente de verificar.",
+    "rutasMejillones"
+  ],
+  [
+    "Antofagasta",
+    "Ruta B-262",
+    "Acceso norte a Mejillones",
+    -23.10, -70.42,
+    "parcial",
+    "Camiones de carga. Movilización continúa el 13/11. Último balance vial detallado del 12/11: restricción para vehículos de carga, con paso permitido para buses y vehículos menores. Situación de hoy pendiente de verificar.",
+    "rutasMejillones"
+  ]
+);
+
+// Incorporar la región al selector
+if (![...region.options].some(
+  o => o.value === "Antofagasta"
+)) {
+  const opcion = document.createElement("option");
+  opcion.value = "Antofagasta";
+  opcion.textContent = "Antofagasta";
+  region.appendChild(opcion);
+}
+
+// Actualizar contador
+document.getElementById("total").textContent = datos.length;
+
 actualizar();
 </script>
 </body>
